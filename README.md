@@ -1,5 +1,7 @@
 # ID My Pill
 
+![ID My Pill Logo](docs/logo.png)
+
 Adverse Drug Events (ADEs) cause an estimated **46 million adverse reactions** per year in the United States [1], resulting in:
 
 - 1.5 million emergency department visits
