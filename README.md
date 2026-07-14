@@ -1,6 +1,6 @@
 # ID My Pill
 
-![ID My Pill Logo](docs/logo.png)
+<img alt="ID My Pill Logo" src="docs/logo.png" width="300"/>
 
 Adverse Drug Events (ADEs) cause an estimated **46 million adverse reactions** per year in the United States [1], resulting in:
 
@@ -45,6 +45,8 @@ The ID My Pill engine gets around this by learning, straight from the data, whic
 ---
 
 ## What ID My Pill does
+
+<img alt="Example pill identification using ID My Pill" src="docs/example-id.png" width="800"/>
 
 A person holds a mystery pill and wants to know what it is.
 
