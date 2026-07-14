@@ -1,0 +1,10 @@
+{
+  "drug_items": "Drug_Item.txt",
+  "drug_item_versions": "Drug_Item_Version.txt",
+  "drug_images": "_GSDD_DrugItem_ImageList.txt",
+  "products": "Product.txt",
+  "shapes": "Shape.txt",
+  "colors": "Color.txt",
+  "routes": "Route_Of_Administration.txt",
+  "dea_classification": "DEA_Classification.txt"
+}

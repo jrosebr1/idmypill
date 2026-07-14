@@ -1,0 +1,136 @@
+openapi: 3.0.0
+info:
+  title: Pill Identification API
+  version: 1.0.3
+servers:
+  # replace with the public base URL where your API is hosted
+  - url: https://YOUR_API_DOMAIN/api/v1
+paths:
+  /id_pill/:
+    post:
+      operationId: idPill
+      summary: Filter pill database based on input query shape, color, and imprints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PillIDRequest'
+      responses:
+        200:
+          description: Filtered list of candidates that could potentially be the pill
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PillIDResponse'
+  /pill_info/:
+    post:
+      operationId: pillInfo
+      summary: Retrieve detailed information about pills based on their NDCs
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PillInfoRequest'
+      responses:
+        200:
+          description: Detailed information about the requested pills
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PillInfoResponse'
+components:
+  schemas:
+    PillIDRequest:
+      type: object
+      properties:
+        shape:
+          $ref: '#/components/schemas/PillShape'
+        colors:
+          type: array
+          items:
+            $ref: '#/components/schemas/PillColor'
+        imprints:
+          type: array
+          items:
+            type: string
+    PillIDResponse:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/PillIDResult'
+    PillShape:
+      type: string
+      enum:
+        - round
+        - capsule
+        - oblong
+        - oval
+        - triangle
+        - rectangle
+        - square
+        - diamond
+        - pentagon (5 sided)
+        - hexagon (6 sided)
+        - octagon (8 sided)
+        - clover
+        - double circle
+        - tear
+        - trapezoid
+        - bullet
+    PillColor:
+      type: string
+      enum:
+        - white
+        - yellow
+        - orange
+        - colorless
+        - rust
+        - gold
+        - blue
+        - pink
+        - beige
+        - maroon
+        - red
+        - amber
+        - brown
+        - green
+        - gray
+        - tan
+        - purple
+        - peach
+        - black
+    PillIDResult:
+      type: object
+      properties:
+        score:
+          type: number
+        name:
+          type: string
+        ndc:
+          type: string
+        shape:
+          $ref: '#/components/schemas/PillShape'
+        colors:
+          type: array
+          items:
+            $ref: '#/components/schemas/PillColor'
+        imprints:
+          type: array
+          items:
+            type: string
+    PillInfoRequest:
+      type: object
+      properties:
+        ndcs:
+          type: array
+          items:
+            type: string
+    PillInfoResponse:
+      type: object
+      properties:
+        response:
+          type: string

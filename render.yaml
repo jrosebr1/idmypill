@@ -1,0 +1,50 @@
+services:
+  - type: web
+    name: idmypill_spl
+    env: python
+    buildCommand: "./deploy/build.sh"
+    startCommand: "gunicorn idmypill_spl.wsgi:application"
+    region: oregon
+    plan: starter
+    numInstances: 1
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.4
+      - key: DJANGO_SETTINGS_MODULE
+        value: idmypill_spl.settings_production
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DJANGO_DEBUG
+        value: "false"
+      - key: DJANGO_ALLOWED_HOSTS
+        value: "" # set to your domain, e.g. api.yourdomain.com
+      - key: PILL_IMAGES_URL
+        value: "https://static.example.com/images/gsdb/" # your image host base URL
+      - key: DJANGO_DATABASE_NAME
+        fromDatabase:
+          name: idmypill_spl
+          property: database
+      - key: DJANGO_DATABASE_USER
+        fromDatabase:
+          name: idmypill_spl
+          property: user
+      - key: DJANGO_DATABASE_PASSWORD
+        fromDatabase:
+          name: idmypill_spl
+          property: password
+      - key: DJANGO_DATABASE_HOST
+        fromDatabase:
+          name: idmypill_spl
+          property: host
+      - key: DJANGO_DATABASE_PORT
+        fromDatabase:
+          name: idmypill_spl
+          property: port
+
+# Postgres database
+databases:
+  - name: idmypill_spl
+    plan: starter
+    databaseName: idmypill_spl
+    user: idmypill_spl
+    ipAllowList: [] # only allow internal connections
