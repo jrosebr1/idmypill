@@ -2,6 +2,8 @@
 
 <img alt="ID My Pill Logo" src="docs/logo.png" width="300"/>
 
+<a href="https://youtu.be/5Rl2EqhfiiY" target="_blank"><img alt="ID My Pill YouTube Video" src="docs/youtube.png" width="600"/></a>
+
 Adverse Drug Events (ADEs) cause an estimated **46 million adverse reactions** per year in the United States [1], resulting in:
 
 - 1.5 million emergency department visits
@@ -50,7 +52,11 @@ The ID My Pill engine gets around this by learning, straight from the data, whic
 
 A person holds a mystery pill and wants to know what it is.
 
-They describe it in plain language, something like _"oval, white, L612 on one side."_ Most people have zero knowledge of prescription drugs, and they are often stressed, in a rush, or ill when they ask. The whole product is built around meeting them there.
+They describe it in plain language, something like: 
+
+> _"Oval, white, 'TV' on one side and '58' on the other."_ 
+
+Most people have _zero knowledge_ of prescription drugs, and they are often stressed, in a rush, or ill when they ask. The whole product is built around meeting them there.
 
 The custom GPT components acts as the interface to the user, while our implementation handles the actual identification.
 
