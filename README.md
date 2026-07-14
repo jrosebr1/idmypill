@@ -425,6 +425,7 @@ The [`gpt/`](gpt/) folder is the other half of the product. To rebuild the assis
 - The co-occurrence matrix stores positional indices into the pill list ordered by database ID. Rebuild the matrix (and restart the API) whenever the set of pills changes, or the indices drift out of alignment.
 - Only oral dosage forms are ingested. Injectables, topicals, and the like are skipped.
 - Shape and color matching is coarse by design (round versus other, white versus other). The precise disambiguation happens in the GPT, not the API.
+- Stage one of the filtering process treats the imprint as a bag of single characters (i.e., throwing away ordering that could be useful for identification). Indexing character bigrams as additional tokens (the same way you would add word bigrams to tf-idf) would sharpen the discriminative triples considerably at modest index cost (and bigrams over imprints are still a tiny vocabulary).
 - Pills whose GSDB description cannot be parsed into a shape, color, and imprint are dropped during ingestion, so the searchable set is smaller than the raw export.
 - The `tests.py` files are stubs. There is no meaningful automated test coverage yet.
 
