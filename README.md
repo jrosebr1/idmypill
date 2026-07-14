@@ -32,9 +32,9 @@ You can either:
 - Upload a photo of the pill
 - Or, describe it in plain English: "round, yellow, TEVA on one side and 3926 on the other"
 
-A custom GPT is then used to parse the input. For text, it parses the user query into the pill's shape, color, and imprint. For a photo, the GPT uses its own vision capabilities to extract the shape, color, and imprint (however, the vision accuracy will be far less accurate, which is an obstacle we overcome later in this project).
+A custom GPT is then used to parse the input. For text, it parses the user query into the pill's shape, color, and imprint. For a photo, the GPT uses its own vision capabilities to extract the shape, color, and imprint (however, the vision extraction will be far less accurate, which is an obstacle we overcome later in this project).
 
-The identification itself happens under the hook via a novel combination of (1) co-occurrence search engine built specifically for pill identification, followed by (2) a custom re-ranking system.
+The identification itself happens under the hood via a novel combination of (1) co-occurrence search engine built specifically for pill identification, followed by (2) a custom re-ranking system.
 
 **Telling 20,000 pills apart is hard precisely because most of them look alike.** More than half the market is round and/or white, so those features barely narrow the search space on their own.
 
@@ -58,7 +58,7 @@ They describe it in plain language, something like:
 
 Most people have _zero knowledge_ of prescription drugs, and they are often stressed, in a rush, or ill when they ask. The whole product is built around meeting them there.
 
-The custom GPT components acts as the interface to the user, while our implementation handles the actual identification.
+The custom GPT component acts as the interface to the user, while our implementation handles the actual identification.
 
 ## How pill identification is performed
 
@@ -73,7 +73,7 @@ At a high level, here is a single identification, start to finish:
 6. Custom GPT    renders a friendly Markdown answer, including the pill image
 ```
 
-The API exposes exactly two endpoints for steps 3 and 5. Everything else is the GPT doing fuzzy, human-facing reasoning that a LLM is good at.
+The API exposes exactly two endpoints for steps 3 and 5. Everything else is the GPT doing fuzzy, human-facing reasoning that an LLM is good at.
 
 ## The Elsevier Gold Standard Drug Database (GSDB)
 
@@ -81,7 +81,7 @@ Every pill in this project comes from the **Gold Standard Drug Database (GSDB), 
 
 This database is a professionally curated dataset of US drug products, updated daily by board-certified pharmacists and used inside hospitals and pharmacies for clinical decision support, order entry, and dispensing. You can read more on [Elsevier's product page](https://www.elsevier.com/products/gold-standard-drug-database).
 
-GSDB is massive, broad database, including drug interactions, a 32-level ingredient-to-product hierarchy, and standard identifiers like NDC and RxNorm. This project uses one narrow slice of it: the physical description of each dispensed pill, along with the pill images.
+GSDB is a massive, broad database, including drug interactions, a 32-level ingredient-to-product hierarchy, and standard identifiers like NDC and RxNorm. This project uses one narrow slice of it: the physical description of each dispensed pill, along with the pill images.
 
 For every oral drug, GSDB records its shape, its colors, the imprint stamped on each side, its National Drug Code (NDC), its DEA schedule, and a reference photograph. That combination is exactly what pill identification needs, tied together and kept current, which is why it is the backbone here.
 
@@ -188,7 +188,7 @@ A common combination like `round-white-"1"` counts for almost nothing. A rare on
 
 Effectively, this method is not unlike [inverse document frequency](https://en.wikipedia.org/wiki/Tf%E2%80%93idf) in text search, applied to the physical features of a pill.
 
-The benefits if this approach include:
+The benefits of this approach include:
 
 - **Fast:** The matrix is precomputed once, so a query is a handful of dictionary lookups instead of a scan over 20,000 pills
 - **Interpretable:** You can see _exactly_ which feature combinations pushed a given pill up the ranking
@@ -206,7 +206,7 @@ The United States drug market covers 20,000+ pills. A person hands you a fuzzy, 
 Two aspects make this hard: 
 
 1. People describe shape and color unreliably
-2. Imprints get misread, reordered, or, in some cases, are not easily identifabile
+2. Imprints get misread, reordered, or, in some cases, are not easily identifiable
 
 The engine handles this in two stages. **Stage one casts a wide, fast net using the shape, color, and imprint characters. Stage two re-ranks the survivors by how well their imprint string actually matches.**
 
@@ -226,11 +226,11 @@ The expansion and sanitization is deliberately coarse, trading precision for rec
 
 ### Shape, color, and imprint co-occurrence matrix
 
-Our [co-occurrence matrix](https://en.wikipedia.org/wiki/Co-occurrence_matrix) is an [inverted index](https://en.wikipedia.org/wiki/Inverted_index), built once and serialized0 to disk.
+Our [co-occurrence matrix](https://en.wikipedia.org/wiki/Co-occurrence_matrix) is an [inverted index](https://en.wikipedia.org/wiki/Inverted_index), built once and serialized to disk.
 
 For every combination of one shape, one color, and one single imprint character, we record the set of pills that have _all three_ at once. The key is the triple `shape` + `color` + `character`; the value is the list of matching pill indices. A metadata block records the total pill count.
 
-The ([`cooccurrence_matrix.py`](apps/pill_id/identification/cooccurrence_matrix.py)) builders walks every `(shape, color, character)` triple across the vocabulary of the whole database and records which pills match the shape exactly, contain that color, and contain that character in their imprint. Precomputing this is what makes search fast at request time.
+The [`cooccurrence_matrix.py`](apps/pill_id/identification/cooccurrence_matrix.py) builder walks every `(shape, color, character)` triple across the vocabulary of the whole database and records which pills match the shape exactly, contain that color, and contain that character in their imprint. Precomputing this is what makes search fast at request time.
 
 ### Stage #1: Co-occurrence filter
 
@@ -239,14 +239,14 @@ Stage one scores candidates by discriminative power.
 For each triple in the query (every combination of an expanded shape, an expanded color, and a character of the imprint), the filter looks up the matching pills and gives each of them a score. The score for a triple is its **importance**, defined as:
 
 ```
-1 - (pills matching the triple / total pills)`
+1 - (pills matching the triple / total pills)
 ```
 
 A triple matched by thousands of pills (round, white, the digit "1") barely narrows anything, so its importance is near zero. A triple matched by only a few pills is strong evidence, so its importance is near one. It behaves like inverse document frequency in text search: rare signals count more.
 
 Every pill accumulates importance across all the query triples it matches. A pill that hits many rare triples floats to the top. 
 
-Stage one ends by keeping on the top 1,000 potential matches.
+Stage one ends by keeping the top 1,000 potential matches.
 
 ### Stage #2: Re-ranking on the imprint
 
@@ -381,7 +381,7 @@ curl -X POST http://127.0.0.1:8000/api/v1/pill_info/ \
   -d '{"ndcs": ["00093-1036"]}'
 ```
 
-The `pill_info` end point returns a single Markdown string: a table per drug with its name, image, NDC, shape, colors, and imprints, plus placeholder rows for usage and warnings that the GPT fills in.
+The `pill_info` endpoint returns a single Markdown string: a table per drug with its name, image, NDC, shape, colors, and imprints, plus placeholder rows for usage and warnings that the GPT fills in.
 
 ## Management commands
 
